@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0066)file:///C:/Users/DeDeDe/Downloads/family-organizer-FINAL-v2_1.html -->
+<!-- saved from url=(0066)file:///C:/Users/DeDeDe/Downloads/family-organizer-FINAL-v2_3.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -331,6 +331,157 @@
         
         .loading { text-align: center; padding: 2rem; color: var(--text-tertiary); }
         
+        /* Day Details Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-secondary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(90deg);
+        }
+        .modal-date {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .modal-day {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+        .modal-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .modal-weather-large {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .modal-weather-icon {
+            font-size: 3rem;
+        }
+        .modal-weather-temp {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .modal-weather-desc {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: capitalize;
+        }
+        .modal-event-item {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent);
+        }
+        .modal-event-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .modal-event-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .modal-event-desc {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .modal-birthday-item {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #FFD700;
+        }
+        .modal-birthday-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .modal-birthday-age {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .modal-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+        
         @media (max-width: 1024px) {
             .dashboard-grid { grid-template-columns: 1fr; }
         }
@@ -372,7 +523,7 @@
         <div class="content-section active" id="dashboard">
             <div class="card">
                 <h2>📅 Today's Events</h2>
-                <div id="todayEvents"><div class="loading">No events today</div></div>
+                <div id="todayEvents"><div class="loading">No events or birthdays today</div></div>
             </div>
             
             <div class="dashboard-grid">
@@ -516,7 +667,12 @@
                     <input type="text" id="spencerTask" placeholder="Add task for Spencer">
                     <button class="btn btn-accent" onclick="addRoutine(&#39;spencer&#39;)">Add Task</button>
                 </div>
-                <ul class="routine-list" id="spencerRoutine"><li class="loading">No tasks yet!</li></ul>
+                <ul class="routine-list" id="spencerRoutine"><li class="routine-item ">
+                    <div class="routine-text">Brush teeth before breakfast</div>
+                    <button class="btn-complete " onclick="toggleRoutineTask(&#39;spencer&#39;, 0)">
+                        Done
+                    </button>
+                </li></ul>
             </div>
 
             <div class="card">
@@ -537,19 +693,19 @@
                 <h2>Family Birthdays</h2>
                 <div class="input-group">
                     <input type="text" id="birthdayName" placeholder="Name">
-                    <input type="date" id="birthdayDate">
+                    <input type="text" id="birthdayDate" placeholder="DD/MM/YYYY (e.g., 15/03/1950)">
                     <button class="btn btn-accent" onclick="addBirthday()">Add Birthday</button>
                 </div>
-                <div class="birthday-grid" id="birthdayList"><div class="birthday-card">
-                    <div class="birthday-countdown">109 DAYS</div>
-                    <div class="birthday-name">Rob Bukey</div>
-                    <div class="birthday-date">June 1</div>
-                </div><div class="birthday-card">
-                    <div class="birthday-countdown">303 DAYS</div>
-                    <div class="birthday-name">Spencer</div>
-                    <div class="birthday-date">December 12</div>
-                </div></div>
+                <div class="birthday-grid" id="birthdayList"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Day Details Modal -->
+    <div class="modal-overlay" id="dayModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeDayModal()">×</button>
+            <div id="modalContent"></div>
         </div>
     </div>
 
@@ -852,31 +1008,60 @@
         
         async function loadTodayEvents() {
             const events = await apiCall('getEvents');
-            if (!events) return;
+            const birthdays = await apiCall('getBirthdays');
             
             const today = new Date().toISOString().split('T')[0];
-            const todayEvents = events.filter(e => e.date && e.date.startsWith(today));
+            const todayMonth = new Date().getMonth();
+            const todayDay = new Date().getDate();
             
             const container = document.getElementById('todayEvents');
             container.innerHTML = '';
             
-            if (todayEvents.length === 0) {
-                container.innerHTML = '<div class="loading">No events today</div>';
-                return;
+            let hasItems = false;
+            
+            // Add calendar events
+            if (events) {
+                const todayEvents = events.filter(e => e.date && e.date.startsWith(today));
+                todayEvents.forEach(event => {
+                    hasItems = true;
+                    const div = document.createElement('div');
+                    div.className = 'today-events';
+                    const sourceBadge = event.source === 'calendar' 
+                        ? '<span style="background: #34A853; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 6px;">📅</span>'
+                        : '';
+                    div.innerHTML = `
+                        <div class="event-title-small">${event.title}${sourceBadge}</div>
+                        <div class="event-time-small">${event.time || 'All day'}</div>
+                    `;
+                    container.appendChild(div);
+                });
             }
             
-            todayEvents.forEach(event => {
-                const div = document.createElement('div');
-                div.className = 'today-events';
-                const sourceBadge = event.source === 'calendar' 
-                    ? '<span style="background: #34A853; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 6px;">📅</span>'
-                    : '';
-                div.innerHTML = `
-                    <div class="event-title-small">${event.title}${sourceBadge}</div>
-                    <div class="event-time-small">${event.time || 'All day'}</div>
-                `;
-                container.appendChild(div);
-            });
+            // Add birthdays
+            if (birthdays) {
+                const todayBirthdays = birthdays.filter(b => {
+                    const bday = new Date(b.date);
+                    return bday.getMonth() === todayMonth && bday.getDate() === todayDay;
+                });
+                
+                todayBirthdays.forEach(birthday => {
+                    hasItems = true;
+                    const age = calculateAge(birthday.date);
+                    const div = document.createElement('div');
+                    div.className = 'today-events';
+                    div.style.borderLeft = '4px solid #FFD700';
+                    div.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05))';
+                    div.innerHTML = `
+                        <div class="event-title-small">🎂 ${birthday.name}'s Birthday!</div>
+                        <div class="event-time-small">Turning ${age} today</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            if (!hasItems) {
+                container.innerHTML = '<div class="loading">No events or birthdays today</div>';
+            }
         }
         
         async function loadCalendar() {
@@ -1011,10 +1196,114 @@
                 if (dayEvents.length > 3) {
                     html += `<div class="calendar-event-dot" style="background: var(--text-tertiary);">+${dayEvents.length - 3} more</div>`;
                 }
+                
+                // Make clickable
+                cell.style.cursor = 'pointer';
+                cell.onclick = () => openDayModal(dateStr, day, month, year);
             }
             
             cell.innerHTML = html;
             return cell;
+        }
+        
+        async function openDayModal(dateStr, day, month, year) {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            const date = new Date(year, month, day);
+            const dayName = dayNames[date.getDay()];
+            const formattedDate = `${monthNames[month]} ${day}, ${year}`;
+            
+            // Get weather
+            const weather = getWeatherForDate(dateStr);
+            
+            // Get events
+            const dayEvents = calendarEvents.filter(e => e.date && e.date.startsWith(dateStr));
+            
+            // Get birthdays
+            const birthdays = await apiCall('getBirthdays');
+            const dayBirthdays = birthdays ? birthdays.filter(b => {
+                const bday = new Date(b.date);
+                return bday.getMonth() === month && bday.getDate() === day;
+            }) : [];
+            
+            // Build modal content
+            let content = `
+                <div class="modal-date">${formattedDate}</div>
+                <div class="modal-day">${dayName}</div>
+            `;
+            
+            // Weather section
+            if (weather) {
+                content += `
+                    <div class="modal-section">
+                        <div class="modal-section-title">🌤️ Weather</div>
+                        <div class="modal-weather-large">
+                            <div class="modal-weather-icon">${weather.emoji}</div>
+                            <div>
+                                <div class="modal-weather-temp">${weather.temp}°C</div>
+                                <div class="modal-weather-desc">${weather.description}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Birthdays section
+            if (dayBirthdays.length > 0) {
+                content += `<div class="modal-section">
+                    <div class="modal-section-title">🎂 Birthdays</div>`;
+                dayBirthdays.forEach(birthday => {
+                    const age = calculateAge(birthday.date);
+                    content += `
+                        <div class="modal-birthday-item">
+                            <div class="modal-birthday-name">${birthday.name}</div>
+                            <div class="modal-birthday-age">Turning ${age}</div>
+                        </div>
+                    `;
+                });
+                content += `</div>`;
+            }
+            
+            // Events section
+            if (dayEvents.length > 0) {
+                content += `<div class="modal-section">
+                    <div class="modal-section-title">📅 Events</div>`;
+                dayEvents.forEach(event => {
+                    const sourceBadge = event.source === 'calendar' 
+                        ? '<span style="background: #34A853; color: white; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; margin-left: 8px;">📅 Google Calendar</span>'
+                        : '';
+                    content += `
+                        <div class="modal-event-item">
+                            <div class="modal-event-title">${event.title}${sourceBadge}</div>
+                            ${event.time ? `<div class="modal-event-time">⏰ ${event.time}</div>` : '<div class="modal-event-time">All day</div>'}
+                            ${event.description ? `<div class="modal-event-desc">${event.description}</div>` : ''}
+                        </div>
+                    `;
+                });
+                content += `</div>`;
+            }
+            
+            // Show "nothing planned" if empty
+            if (!weather && dayBirthdays.length === 0 && dayEvents.length === 0) {
+                content += `<div class="modal-empty">Nothing planned for this day</div>`;
+            }
+            
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('dayModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeDayModal() {
+            document.getElementById('dayModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function closeModal(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeDayModal();
+            }
         }
         
         // Routine Functions
@@ -1062,12 +1351,38 @@
         // Birthday Functions
         async function addBirthday() {
             const name = document.getElementById('birthdayName').value.trim();
-            const date = document.getElementById('birthdayDate').value;
-            if (!name || !date) return alert('Please enter name and date!');
+            const dateInput = document.getElementById('birthdayDate').value.trim();
+            
+            if (!name || !dateInput) return alert('Please enter name and date!');
+            
+            // Parse date - supports DD/MM/YYYY or YYYY-MM-DD
+            let date;
+            if (dateInput.includes('/')) {
+                const parts = dateInput.split('/');
+                if (parts.length === 3) {
+                    // DD/MM/YYYY format
+                    const day = parts[0].padStart(2, '0');
+                    const month = parts[1].padStart(2, '0');
+                    const year = parts[2];
+                    date = `${year}-${month}-${day}`;
+                } else {
+                    return alert('Please use DD/MM/YYYY format (e.g., 15/03/1950)');
+                }
+            } else {
+                date = dateInput; // Already in YYYY-MM-DD format
+            }
+            
+            // Validate date
+            const testDate = new Date(date);
+            if (isNaN(testDate.getTime())) {
+                return alert('Invalid date! Please use DD/MM/YYYY format (e.g., 15/03/1950)');
+            }
+            
             await apiCall('addBirthday', { name, date });
             document.getElementById('birthdayName').value = '';
             document.getElementById('birthdayDate').value = '';
             loadBirthdays();
+            loadTodayEvents();
         }
         
         function getDaysUntil(dateStr) {
@@ -1076,6 +1391,26 @@
             const thisYear = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
             if (thisYear < today) thisYear.setFullYear(today.getFullYear() + 1);
             return Math.ceil((thisYear - today) / (1000 * 60 * 60 * 24));
+        }
+        
+        function calculateAge(dateStr) {
+            const today = new Date();
+            const birthDate = new Date(dateStr);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            // Check if birthday hasn't happened yet this year
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            // If birthday is today or in the future this year, show next age
+            const thisYearBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (thisYearBirthday >= today) {
+                age++;
+            }
+            
+            return age;
         }
         
         async function loadBirthdays() {
@@ -1094,12 +1429,14 @@
             
             birthdays.forEach(birthday => {
                 const days = getDaysUntil(birthday.date);
+                const age = calculateAge(birthday.date);
                 const div = document.createElement('div');
                 div.className = 'birthday-card';
                 div.innerHTML = `
                     <div class="birthday-countdown">${days === 0 ? '🎉 TODAY! 🎉' : days === 1 ? '1 DAY' : `${days} DAYS`}</div>
                     <div class="birthday-name">${birthday.name}</div>
                     <div class="birthday-date">${new Date(birthday.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</div>
+                    <div style="font-size: 1.1rem; margin-top: 0.5rem; opacity: 0.95; position: relative; z-index: 1;">Turning ${age}</div>
                 `;
                 container.appendChild(div);
             });
